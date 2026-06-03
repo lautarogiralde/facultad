@@ -1,0 +1,51 @@
+EOI EQU 20h
+IMR EQU 21h
+INT0 EQU 24h
+N_F10 EQU 10
+
+ORG 40
+IP_F10 dw RUT_F10
+
+ORG 1000h
+VALOR db "9"
+i db 1
+FIN db 0
+
+ORG 3000h
+RUT_F10: PUSH AX
+PUSH BX
+MOV BX, offset VALOR
+MOV AL, 1
+INT 7
+MOV FIN, 1
+MOV AL, EOI
+OUT EOI, AL
+POP BX
+POP AX
+IRET
+
+init: PUSH AX
+MOV AL, N_F10
+OUT INT0, AL
+MOV AL, 0FEh
+OUT IMR, AL
+POP AX
+RET
+
+ORG 2000h
+CALL init
+cambio: CMP i, 1
+JNZ positivo
+MOV i, -1
+JMP loop
+positivo: MOV i, 1
+loop: MOV AH, i
+ADD VALOR, AH
+CMP VALOR, '0'
+JZ cambio
+CMP VALOR, '9'
+JZ cambio
+CMP FIN, 1
+JNZ loop
+INT 0
+end
