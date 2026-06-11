@@ -28,3 +28,16 @@ fin:    halt
 
 ;c)	Confeccionar una tabla que compare número de ciclos, CPI, RAWs y Branch Taken Stalls para los dos casos anteriores.
 ;   
+;   Sin Branch Target Buffer:
+;       Ciclos: 71
+;       Instrucciones: 43
+;       CPI: 1.651
+;       RAWs: 16
+;       Branch Taken Stalls: 8
+
+;   Con Branch Target Buffer:
+;       Ciclos: 67
+;       Instrucciones: 43
+;       CPI: 1.558
+;       RAWs: 16
+;       Branch Taken Stalls: 4
