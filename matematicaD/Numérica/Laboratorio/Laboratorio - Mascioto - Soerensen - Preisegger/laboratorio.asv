@@ -1,0 +1,130 @@
+% ---- Importación de datos ----
+
+[tiempo]=xlsread('Generador_de_señal.xls',11,'A2:A171');         %Importa datos de tiempo del archivo de excel
+[aceleracion]=xlsread('Generador_de_señal.xls',11,'B2:B171');    %Importa datos de aceleracion del archivo de excel
+cte=0.6;         %Constante
+
+% ---- Interpolación ----
+
+x1= [7:0.001:8];     %Vector con los puntos del eje x (tiempo)
+
+y1=interp1(tiempo,aceleracion,x1,'spline'); %Interpolacion mediante spline cubico. Guarda en un vector los valores de la aceleración para cada x1.
+plot(tiempo,aceleracion,'b',x1,y1,'g')  %Gráfico
+
+% ---- Integración ----
+
+h=0.001;                 %paso elegido para intregracion por trapecio
+n=length(x1);               %cantidad de subintervalos
+  
+velocidad=zeros(1,length(x1));                  %vector de velocidad
+desplazamiento=zeros(1,length(x1));             %vector de desplazamiento
+
+velocidad(1)=0;             % Consideramos la velocidad inicial igual a 0
+desplazamiento(1)=0;        %Consideramos el desplazamiento inicial igual a 0
+
+for i=1:n-1
+    velocidad(i+1)=(velocidad(i) + ((y1(i)+y1(i+1))*h/2));  %Aplicamos la formula del trapecio para hallar la velocidad
+    desplazamiento(i+1)=(desplazamiento(i) + ((velocidad(i)+velocidad(i+1))*h/2));  %Aplicamos la formula del trapecio para hallar el desplazamiento  
+end
+
+% ---- Deformación ----
+
+deformacion=zeros(1,length(desplazamiento));
+
+for i=1 : length(desplazamiento)
+    deformacion(i)=cte*desplazamiento(i);
+end;
+
+plot(x1,deformacion,'r');   %Gráfico de deformación versus tiempo
+
+
+% ---- Derivación ----
+
+
+jerk=zeros(1,length(x1));       %vector de jerk
+
+jerk(1)=(y1(2)-y1(1))/h;        %diferencias hacia adelante en el punto inicial
+
+for i=1:(n-2)
+    jerk(i+1)=jerk(i) + (y1(i+2)-y1(i+1))/h;   %diferencias hacia adelante
+end
+
+jerk(n) = jerk(n-1) + ((y1(n) - y1(n-1)) / h);   %diferencias hacia atrás en el último punto
+
+
+% Cálculo del error cuadrático medio
+
+ecm=0;
+
+for i=1:length(x1)
+    t = 7+ i*h;
+    if ((t>=7 & t<7.2) | (t>7.205 & t<7.8) | (t>7.805 & t<8))   %Tramo 1, 3 o 5
+        real=tramo135(t);
+    elseif (t>=7.2 & t<=7.8) %Tramo 2
+        real=tramo2(t);
+    else                    %Tramo 4
+        real=tramo4(t);
+    end
+    ecm=ecm + (real-y1(i))^2;     
+end
+
+ecm= sqrt(ecm/length(x1));      % Error cuadrático medio final
+disp('El error cuadrático medio es: ')
+disp(ecm)
+
+
+% Cálculo de los 10 errores máximos absolutos 
+
+errores=zeros(1,10);    %Vector para almacenar los 10 errores máximos absolutos
+
+for i=1:length(errores)
+    t=7+ i*h;
+    errores(i)=abs(tramo135(t)-y1(i));    % Guarda los primeros 10 errores absolutos     
+end
+
+for i=11:n
+    t=7+ i*h;
+    if ((t>=7 & t<7.2) | (t>7.205 & t<7.8) | (t>7.805 & t<8))   %Tramo 1, 3 o 5
+        actual=tramo135(t);
+    elseif (t>=7.2 & t<=7.8) %Tramo 2
+        actual=tramo2(t);
+    else                    %Tramo 4
+        actual=tramo4(t);
+    end
+    
+    error=abs(actual-y1(i));
+    
+    %Busco el valor mínimo del vector de errores
+    min=errores(1);
+    for j=1:length(errores)
+        if (errores(j) < min)
+            min=errores(j);  %Guardo el mínimo
+            posmin=j;        %Guardo la posición del valor mínimo
+        end
+    end
+    
+    if (error>min)
+        errores(posmin)=error;  %Actualizo vector de errores
+    end
+    
+end
+
+disp('Los 10 errores máximos absolutos son ')
+disp(errores)
+    
+
+    
+
+
+
+        
+        
+
+     
+            
+
+            
+
+
+
+
