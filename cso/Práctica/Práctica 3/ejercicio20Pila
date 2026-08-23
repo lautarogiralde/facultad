@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#Implementa una pila con arreglos
+
+pila=()
+
+function push
+{
+    if [ $# -ne 1 ]
+    then
+        echo "La Cantidad de parametros es incorrecta"
+        return 1
+    fi
+    longitud=${#pila[*]}
+    pila[$longitud]=$1
+}
+
+function pop
+{
+    ultimoElem=`expr ${#pila[*]} - 1`
+    echo ${pila[$ultimoElem]}
+    unset pila[$ultimoElem]
+}
+
+function length
+{
+    echo ${#pila[*]}
+}
+
+function print
+{
+    echo ${pila[*]}
+}
+
+push primero
+push segundo
+push tercero
+push cuarto
+echo "Longitud:"
+length
+echo "Todos los elementos"
+print
+pop
+pop
+echo "Longitud:"
+length
+echo "Todos los elementos"
+print
