@@ -1,0 +1,19 @@
+Comandos para subir a github:
+
+git clone 	(clona repositorio en la carpeta local)
+
+(agregar archivos que se quieren subir a la carpeta clonada)
+
+cd cookbooks 	(moverse a la carpeta clonada)
+
+git add .
+
+git clone -m "Mensaje"
+
+git push
+
+
+___________________
+
+pwd -> ruta del directorio local
+cd -> cambio de directorio
